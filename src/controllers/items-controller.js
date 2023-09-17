@@ -3,6 +3,25 @@ const utils = require('../utils/utils')
 
 const prisma = new PrismaClient()
 
+const getItem = async (req, res) => {
+  try {
+    const item = await prisma.item.findUnique({
+      where: {
+        id: req.params.id,
+      },
+    })
+
+    if (!item) {
+      res.status(404).json({ message: 'Item não encontrado' })
+    } else {
+      res.status(200).json(item)
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    res.status(500).json({ message: utils.errorMessage })
+  }
+}
+
 const getItems = async (req, res) => {
   try {
     const items = await prisma.item.findMany()
@@ -88,4 +107,5 @@ module.exports = {
   updateItem,
   deleteItem,
   getItems,
+  getItem,
 }
