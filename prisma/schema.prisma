@@ -15,8 +15,7 @@ model Item {
   updated_at DateTime?
   quantity Int @default(0)
 
-  updated_by User? @relation(fields: [user_id], references: [id])
-  user_id String? @db.ObjectId
+  movementations Movementation[]
 
   @@map("items")
 }
@@ -30,7 +29,23 @@ model User {
   created_at DateTime @default(now())
   updated_at DateTime?
 
-  item Item[]
+  movemetations Movementation[]
 
   @@map("users")
+}
+
+model Movementation {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  created_at DateTime @default(now())
+  updated_at DateTime?
+  move_type String @default("")
+  quantity Int @default(0)
+
+  item Item? @relation(fields: [item_id], references: [id])
+  item_id String? @db.ObjectId
+
+  user User? @relation(fields: [user_id], references: [id])
+  user_id String? @db.ObjectId
+
+  @@map("movementations")
 }

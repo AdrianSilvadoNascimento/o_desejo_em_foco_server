@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 require('dotenv').config()
 const { env } = require('process')
 
+const movementationRoutes = require('./routes/movementations-routes')
 const itemsRoutes = require('./routes/items-routes')
 const userRoutes = require('./routes/user-routes')
 
@@ -15,6 +16,7 @@ app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
+app.use('/movementation', movementationRoutes)
 app.use('/user', userRoutes)
 app.use('/', itemsRoutes)
 
