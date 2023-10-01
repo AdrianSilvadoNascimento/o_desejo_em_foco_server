@@ -11,9 +11,10 @@ model Item {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String @default("")
   category String @default("")
+  unit_price Float @default(0)
+  quantity Int @default(0)
   created_at DateTime @default(now())
   updated_at DateTime?
-  quantity Int @default(0)
 
   movementations Movementation[]
 

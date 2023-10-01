@@ -7,6 +7,22 @@ const move_type = {
   entrada: 'Entrada',
 }
 
+const movementations = async (req, res) => {
+  try {
+    const movementations = await prisma.movementation.findMany({
+      include: {
+        user: true,
+        item: true,
+      },
+    })
+
+    res.status(200).json(movementations)
+  } catch (error) {
+    console.error('Error:', error)
+    res.status(500).json({ message: utils.errorMessage })
+  }
+}
+
 const move = async (req, res) => {
   try {
     const body = req.body
@@ -39,7 +55,7 @@ const move = async (req, res) => {
         newQuantity = item.quantity + body.quantity
       }
 
-      const updatedItem = await prisma.item.update({
+      await prisma.item.update({
         where: {
           id: itemId,
         },
@@ -59,7 +75,7 @@ const move = async (req, res) => {
           }
         })
 
-        res.status(200).json({ message: 'Movimentação feita com sucesso', newMovementation })
+        res.status(200).json({ message: 'Movimentação feita com sucesso' })
       }
     }
   } catch (error) {
@@ -68,6 +84,34 @@ const move = async (req, res) => {
   }
 }
 
+const deleteMovementation = async (req, res) => {
+  try {
+    const movementationId = req.params.id
+    const movementation = await prisma.movementation.findUnique({
+      where: {
+        id: movementationId,
+      },
+    })
+
+    if (!movementation) {
+      res.status(404).json({ message: 'Movimentação não encontrada' })
+    } else {
+      await prisma.movementation.delete({
+        where: {
+          id: movementationId,
+        },
+      })
+
+      res.status(200).json({ message: 'Movimentação deletada com sucesso' })
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    res.status(500).json({ message: utils.errorMessage })
+  }
+}
+
 module.exports = {
+  deleteMovementation,
+  movementations,
   move,
 }
