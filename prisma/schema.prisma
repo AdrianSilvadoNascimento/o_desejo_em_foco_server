@@ -13,6 +13,7 @@ model Item {
   category String @default("")
   unit_price Float @default(0)
   quantity Int @default(0)
+  product_image String @default("")
   created_at DateTime @default(now())
   updated_at DateTime?
 

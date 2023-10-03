@@ -27,7 +27,7 @@ const getItems = async (req, res) => {
     const items = await prisma.item.findMany()
 
     if (!items.length) {
-      return res.status(401).json({ message: 'Não há items para enviar' })
+      return res.status(200).json([])
     } else {
       res.status(200).json(items)
     }
