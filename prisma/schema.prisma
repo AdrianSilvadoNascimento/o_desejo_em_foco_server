@@ -17,6 +17,12 @@ model Item {
   created_at DateTime @default(now())
   updated_at DateTime?
 
+  user User @relation(fields: [user_id], references: [id])
+  user_id String @db.ObjectId
+
+  employee Employee @relation(fields: [employee_id], references: [id])
+  employee_id String @db.ObjectId
+
   movementations Movementation[]
 
   @@map("items")
@@ -31,7 +37,10 @@ model User {
   created_at DateTime @default(now())
   updated_at DateTime?
 
+  item Item[]
   movemetations Movementation[]
+  clients Client[]
+  employee Employee[]
 
   @@map("users")
 }
@@ -49,5 +58,55 @@ model Movementation {
   user User? @relation(fields: [user_id], references: [id])
   user_id String? @db.ObjectId
 
+  employee Employee @relation(fields: [employee_id], references: [id])
+  employee_id String @db.ObjectId
+
   @@map("movementations")
+}
+
+model Client {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  lastname String
+  age Int
+  email String @unique
+  buy_quantity Int
+
+  user User @relation(fields: [user_id], references: [id])
+  user_id String @db.ObjectId
+
+  address ClientAddress[]
+
+  @@map("clients")
+}
+
+model ClientAddress {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  street String
+  house_number Int
+  neighborhood String
+  postal_code String
+  country String
+
+  user Client @relation(fields: [client_id], references: [id])
+  client_id String @db.ObjectId
+
+  @@map("clientAddresses")
+}
+
+model Employee {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  lastname String
+  email String @unique
+  type Int
+  password String
+
+  user User @relation(fields: [user_id], references: [id])
+  user_id String @db.ObjectId
+
+  item Item[]
+  movementation Movementation[]
+
+  @@map("employees")
 }

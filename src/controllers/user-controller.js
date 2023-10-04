@@ -35,15 +35,66 @@ const registerUser = async (req, res) => {
   }
 }
 
+const registerEmployee = async (req, res) => {
+  try {
+    const body = req.body
+
+    if (body.employerEmail && body.password) {
+      const employer = await prisma.user.findUnique({
+        where: {
+          email: body.employerEmail,
+        }
+      })
+
+      if (employer) {
+        const salt = await bcrypt.genSalt(10)
+        body.password = await bcrypt.hash(body.password, salt)
+        
+        await prisma.user.update({
+          where: {
+            email: body.employerEmail,
+          },
+          data: {
+            employee: {
+              create: {
+                name: body.name,
+                email: body.email,
+                lastname: body.lastname,
+                password: body.password,
+                type: body.type,
+              }
+            }
+          }
+        })
+
+        res.status(200).json({ message: "Employee successfuly registered" })
+      } else {
+        res.status(404).json({ message: "Email da Loja não encontrado" })
+      }
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    res.status(500).json({ message: utils.errorMessage })
+  }
+}
+
 const loginUser = async (req, res) => {
   try {
     const body = req.body
     const email = body.email
-    const user = await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
       where: {
         email: email,
       }
     })
+
+    if (!user) {
+      user = await prisma.employee.findUnique({
+        where: {
+          email: email,
+        }
+      })
+    }
 
     if (user) {
       const invalidPassword = await bcrypt.compare(body.password, user.password)
@@ -71,7 +122,7 @@ const loginUser = async (req, res) => {
         })
       }
     } else {
-      res.status(401).json({ message: 'E-mail inválido!' })
+      res.status(401).json({ message: 'Credenciais Inválidas! Favor, tentar novamente' })
     }
   } catch (error) {
     res.status(500).json({ message: utils.errorMessage })
@@ -79,6 +130,7 @@ const loginUser = async (req, res) => {
 }
 
 module.exports = {
+  registerEmployee,
   registerUser,
   loginUser,
 }
