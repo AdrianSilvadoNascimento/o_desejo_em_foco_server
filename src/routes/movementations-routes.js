@@ -4,7 +4,7 @@ const movementationController = require('../controllers/movementations-controlle
 
 const router = express.Router()
 
-router.get('/', movementationController.movementations)
+router.get('/:id', movementationController.movementations)
 router.post('/move', movementationController.move)
 router.delete('/move/:id', movementationController.deleteMovementation)
 

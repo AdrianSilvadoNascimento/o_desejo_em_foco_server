@@ -9,14 +9,36 @@ const move_type = {
 
 const movementations = async (req, res) => {
   try {
-    const movementations = await prisma.movementation.findMany({
-      include: {
-        user: true,
-        item: true,
+    const userId = req.params.id
+    const employer = await prisma.user.findUnique({
+      where: {
+        id: userId,
       },
     })
 
-    res.status(200).json(movementations)
+    const employee = await prisma.employee.findUnique({
+      where: {
+        id: userId,
+      },
+    })
+
+    const user = employer ? employer : employee
+    const parentItemId = user.user_id ? user.user_id : user.id
+    
+    if (user) {
+      const movementations = await prisma.movementation.findMany({
+        where: {
+          user_id: parentItemId,
+        },
+        include: {
+          user: true,
+          item: true,
+        },
+      })
+      res.status(200).json(movementations)
+    } else {
+      res.status(404).json({ message: 'Loja não encontrada' })
+    }
   } catch (error) {
     console.error('Error:', error)
     res.status(500).json({ message: utils.errorMessage })
@@ -32,12 +54,20 @@ const move = async (req, res) => {
     if (!itemId && !userId) {
       return res.status(401).json({ message: 'ID do usuário ou do item inválido' })
     } else {
-      const user = await prisma.user.findUnique({
+      const employer = await prisma.user.findUnique({
         where: {
           id: userId,
         }
       })
-      
+
+      const employee = await prisma.employee.findUnique({
+        where: {
+          id: userId,
+        }
+      })
+
+      const user = employer ? employer : employee
+
       const item = await prisma.item.findUnique({
         where: {
           id: itemId,
@@ -66,12 +96,21 @@ const move = async (req, res) => {
       })
       
       if (user && item) {
-        const newMovementation = await prisma.movementation.create({
+        await prisma.item.update({
+          where: {
+            id: item.id,
+          },
           data: {
-            move_type: body.move_type,
-            item_id: itemId,
-            user_id: userId,
-            quantity: newQuantity,
+            movementations: {
+              create: {
+                move_type: body.move_type,
+                item_id: itemId,
+                user_id: userId,
+                quantity: newQuantity,
+                employee_id: employee?.id,
+                updated_at: new Date().toISOString(),
+              }
+            }
           }
         })
 
