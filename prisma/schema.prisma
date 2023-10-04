@@ -20,8 +20,8 @@ model Item {
   user User @relation(fields: [user_id], references: [id])
   user_id String @db.ObjectId
 
-  employee Employee @relation(fields: [employee_id], references: [id])
-  employee_id String @db.ObjectId
+  employee Employee? @relation(fields: [employee_id], references: [id])
+  employee_id String? @db.ObjectId
 
   movementations Movementation[]
 

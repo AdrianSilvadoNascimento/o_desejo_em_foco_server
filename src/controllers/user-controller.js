@@ -67,7 +67,7 @@ const registerEmployee = async (req, res) => {
           }
         })
 
-        res.status(200).json({ message: "Employee successfuly registered" })
+        res.status(200).json({ message: "Funcionário registrado com sucesso!" })
       } else {
         res.status(404).json({ message: "Email da Loja não encontrado" })
       }
