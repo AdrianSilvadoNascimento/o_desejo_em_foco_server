@@ -47,29 +47,38 @@ const registerEmployee = async (req, res) => {
       })
 
       if (employer) {
-        const salt = await bcrypt.genSalt(10)
-        body.password = await bcrypt.hash(body.password, salt)
-        
-        await prisma.user.update({
+        const newEmployee = await prisma.employee.findUnique({
           where: {
-            email: body.employerEmail,
+            email: body.email,
           },
-          data: {
-            employee: {
-              create: {
-                name: body.name,
-                email: body.email,
-                lastname: body.lastname,
-                password: body.password,
-                type: body.type,
-              }
-            }
-          }
         })
 
-        res.status(200).json({ message: "Funcionário registrado com sucesso!" })
+        if (!newEmployee) {
+          const salt = await bcrypt.genSalt(10)
+          body.password = await bcrypt.hash(body.password, salt)
+          
+          await prisma.user.update({
+            where: {
+              email: body.employerEmail,
+            },
+            data: {
+              employee: {
+                create: {
+                  name: body.name,
+                  email: body.email,
+                  lastname: body.lastname,
+                  password: body.password,
+                  type: body.type,
+                }
+              }
+            }
+          })
+          res.status(200).json({ message: 'Funcionário registrado com sucesso!' })
+        } else {
+          res.status(401).json({ message: 'Funcionário já registrado' })
+        }
       } else {
-        res.status(404).json({ message: "Email da Loja não encontrado" })
+        res.status(404).json({ message: 'Email da Loja não encontrado' })
       }
     }
   } catch (error) {
