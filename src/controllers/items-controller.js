@@ -32,7 +32,6 @@ const getItems = async (req, res) => {
     })
     
     if (user) {
-      console.log('Pegando itens através do master')
       const items = await prisma.item.findMany({
         where: {
           user_id: user.id,
@@ -41,7 +40,6 @@ const getItems = async (req, res) => {
 
       res.status(200).json(items)
     } else {
-      console.log('Pegando itens através do funcionário')
       const employee = await prisma.employee.findUnique({
         where: {
           id: userId,
