@@ -104,7 +104,6 @@ const move = async (req, res) => {
             movementations: {
               create: {
                 move_type: body.move_type,
-                item_id: itemId,
                 user_id: userId,
                 quantity: newQuantity,
                 employee_id: employee?.id,
