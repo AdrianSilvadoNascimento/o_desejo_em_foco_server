@@ -33,6 +33,7 @@ const movementations = async (req, res) => {
         include: {
           user: true,
           item: true,
+          employee: true,
         },
       })
       res.status(200).json(movementations)
