@@ -67,8 +67,6 @@ const move = async (req, res) => {
         }
       })
 
-      const user = employer ? employer : employee
-
       const item = await prisma.item.findUnique({
         where: {
           id: itemId,
@@ -96,7 +94,7 @@ const move = async (req, res) => {
         }
       })
       
-      if (user && item) {
+      if ((employer || employee) && item) {
         await prisma.item.update({
           where: {
             id: item.id,
@@ -105,7 +103,7 @@ const move = async (req, res) => {
             movementations: {
               create: {
                 move_type: body.move_type,
-                user_id: userId,
+                user_id: employer ? employer.id : employee.id,
                 quantity: newQuantity,
                 employee_id: employee?.id,
                 updated_at: new Date().toISOString(),
