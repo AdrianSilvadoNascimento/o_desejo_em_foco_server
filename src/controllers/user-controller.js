@@ -91,19 +91,19 @@ const loginUser = async (req, res) => {
   try {
     const body = req.body
     const email = body.email
-    let user = await prisma.user.findUnique({
+    const employee = await prisma.employee.findUnique({
       where: {
         email: email,
-      }
+      },
     })
 
-    if (!user) {
-      user = await prisma.employee.findUnique({
-        where: {
-          email: email,
-        }
-      })
-    }
+    const employer = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    })
+
+    const user = employee ? employee : employer
 
     if (user) {
       const invalidPassword = await bcrypt.compare(body.password, user.password)
@@ -115,7 +115,8 @@ const loginUser = async (req, res) => {
           {
             user: user.name,
             email: user.email,
-            userId: user.id,
+            userId: employer ? employer.id : employee.user_id,
+            employeeId: employee ? employee.id : '',
           },
           env.SECRET_MESSAGE,
           {
@@ -125,7 +126,8 @@ const loginUser = async (req, res) => {
 
         return res.status(200).json({
           token: token,
-          userId: user.id,
+          userId: employer ? employer.id : employee.user_id,
+          employeeId: employee ? employee.id : '',
           expiresIn: 3600,
           user: user.name,
         })

@@ -40,21 +40,7 @@ const getItems = async (req, res) => {
 
       res.status(200).json(items)
     } else {
-      const employee = await prisma.employee.findUnique({
-        where: {
-          id: userId,
-        },
-      })
-
-      if (employee) {
-        const items = await prisma.item.findMany({
-          where: {
-            user_id: employee.user_id,
-          },
-        })
-
-        res.status(200).json(items)
-      }
+      res.status(200).json([])
     }
   } catch (error) {
     console.error('Error:', error)
@@ -65,16 +51,17 @@ const getItems = async (req, res) => {
 const registerItem = async (req, res) => {
   try {
     const body = req.body
+    const userId = req.params.id
     const user = await prisma.user.findUnique({
       where: {
-        id: body.userId,
+        id: userId,
       }
     })
 
     if (user) {
       await prisma.user.update({
         where: {
-          id: body.userId,
+          id: userId,
         },
         data: {
           item: {
@@ -90,34 +77,6 @@ const registerItem = async (req, res) => {
       })
 
       res.status(200).json({ message: "Novo produto adicionado com sucesso!" })
-    } else {
-      const employee = await prisma.employee.findUnique({
-        where: {
-          id: body.userId,
-        }
-      })
-
-      if (employee) {
-        await prisma.user.update({
-          where: {
-            id: employee.user_id,
-          },
-          data: {
-            item: {
-              create: {
-                name: body.name,
-                category: body.category,
-                product_image: body.product_image,
-                quantity: body.quantity,
-                unit_price: body.unit_price,
-                employee_id: employee.id,
-              },
-            },
-          },
-        })
-
-        res.status(200).json({ message: "Novo produto adicionado com sucesso!" })
-      }
     }
   } catch (error) {
     console.error('Error:', error)

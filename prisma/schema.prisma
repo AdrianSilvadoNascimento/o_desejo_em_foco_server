@@ -71,6 +71,8 @@ model Client {
   age Int
   email String @unique
   buy_quantity Int
+  created_at DateTime @default(now())
+  updated_at DateTime?
 
   user User @relation(fields: [user_id], references: [id])
   user_id String @db.ObjectId
@@ -87,6 +89,8 @@ model ClientAddress {
   neighborhood String
   postal_code String
   country String
+  created_at DateTime @default(now())
+  updated_at DateTime?
 
   user Client @relation(fields: [client_id], references: [id])
   client_id String @db.ObjectId
@@ -101,6 +105,8 @@ model Employee {
   email String @unique
   type Int
   password String
+  created_at DateTime @default(now())
+  updated_at DateTime?
 
   user User @relation(fields: [user_id], references: [id])
   user_id String @db.ObjectId

@@ -6,6 +6,6 @@ const router = express.Router()
 
 router.get('/:id', movementationController.movementations)
 router.post('/move', movementationController.move)
-router.delete('/move/:id', movementationController.deleteMovementation)
+router.delete('/delete-move/:id', movementationController.deleteMovementation)
 
 module.exports = router

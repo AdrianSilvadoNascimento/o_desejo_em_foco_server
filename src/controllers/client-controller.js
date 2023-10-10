@@ -9,7 +9,7 @@ const getClients = async (req, res) => {
 
     const clients = await prisma.client.findMany({
       where: {
-        id: id,
+        user_id: id,
       },
     })
 
@@ -46,7 +46,51 @@ const getClient = async (req, res) => {
 }
 
 const registerClient = async (req, res) => {
+  try {
+    const body = req.body
+    const userId = req.params.id
 
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    })
+
+    if (user) {
+      await prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          clients: {
+            create: {
+              name: body.name,
+              lastname: body.lastname,
+              age: body.age,
+              email: body.email,
+              buy_quantity: 1,
+              address: {
+                create: {
+                  street: body.street,
+                  house_number: parseInt(body.house_number),
+                  country: body.country,
+                  neighborhood: body.neighbourhood,
+                  postal_code: body.postal_code,
+                },
+              },
+            },
+          },
+        },
+      })
+
+      res.status(200).json({ message: 'Cliente registrado com sucesso!' })
+    } else {
+      res.status(404).json({ message: 'Estabelecimento não encontrado' })
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    res.status(500).json({ message: utils.errorMessage })
+  }
 }
 
 const updateClient = async (req, res) => {
