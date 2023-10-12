@@ -112,16 +112,22 @@ const deleteItem = async (req, res) => {
     const item = await prisma.item.findUnique({
       where: {
         id: req.params.id,
-      }
+      },
     })
 
     if (!item) {
       res.status(404).json({ message: 'Item não encontrado' })
     } else {
+      await prisma.movementation.deleteMany({
+        where: { 
+          item_id: item.id,
+        },
+      })
+      
       await prisma.item.delete({
         where: {
           id: req.params.id,
-        }
+        },
       })
 
       res.status(200).json({ message: 'Item deletado com sucesso' })

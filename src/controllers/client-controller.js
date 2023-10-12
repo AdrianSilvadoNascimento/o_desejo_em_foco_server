@@ -94,11 +94,74 @@ const registerClient = async (req, res) => {
 }
 
 const updateClient = async (req, res) => {
+  try {
+    const clientId = req.params.id
+    const body = req.body
 
+    const client = await prisma.client.findUnique({
+      where: {
+        id: clientId,
+      },
+    })
+
+    if (client) {
+      await prisma.client.update({
+        where: {
+          id: clientId,
+        },
+        data: {
+          name: body.name,
+          lastname: body.lastname,
+          age: body.age,
+          email: body.email,
+          buy_quantity: 1,
+          address: {
+            update: {
+              street: body.street,
+              house_number: parseInt(body.house_number),
+              country: body.country,
+              neighborhood: body.neighbourhood,
+              postal_code: body.postal_code,
+            },
+          },
+        },
+      })
+
+      res.status(200).json({ message: 'Cliente atualizado com sucesso!' })
+    } else {
+      res.status(404).json({ message: 'Cliente não encontrado' })
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    res.status(500).json({ message: utils.errorMessage })
+  }
 }
 
 const deleteClient = async (req, res) => {
+  try {
+    const clientId = req.params.id
 
+    const client = await prisma.client.findUnique({
+      where: {
+        id: clientId,
+      },
+    })
+
+    if (client) {
+      await prisma.client.delete({
+        where: {
+          id: clientId,
+        },
+      })
+
+      res.status(200).json({ message: 'Cliente deletado com sucesso!' })
+    } else {
+      res.status(404).json({ message: 'Cliente não encontrado' })
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    res.status(500).json({ message: utils.errorMessage })
+  }
 }
 
 module.exports = {
