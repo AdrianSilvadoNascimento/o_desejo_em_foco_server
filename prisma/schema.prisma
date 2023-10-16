@@ -75,6 +75,7 @@ model Client {
   lastname String
   age Int
   email String @unique
+  sex String
   created_at DateTime @default(now())
   updated_at DateTime?
 
@@ -97,7 +98,7 @@ model ClientAddress {
   updated_at DateTime?
 
   user Client @relation(fields: [client_id], references: [id])
-  client_id String @db.ObjectId
+  client_id String @db.ObjectId @unique
 
   @@map("clientAddresses")
 }

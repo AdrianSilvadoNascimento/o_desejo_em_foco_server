@@ -32,10 +32,35 @@ const getClient = async (req, res) => {
       where: {
         id: id,
       },
+      include: {
+        address: true,
+      },
     })
 
     if (client) {
-      res.status(200).json(client)
+      const {
+        country,
+        created_at,
+        house_number,
+        neighborhood,
+        postal_code,
+        street,
+        updated_at,
+      } = client.address[0]
+
+      const clientWithoutAddress = {
+        ...client,
+        address: undefined,
+        country,
+        created_at,
+        house_number,
+        neighborhood,
+        postal_code,
+        street,
+        updated_at,
+      }
+
+      res.status(200).json(clientWithoutAddress)
     } else {
       res.status(404).json({ message: 'Cliente não encontrado' })
     }
@@ -68,7 +93,7 @@ const registerClient = async (req, res) => {
               lastname: body.lastname,
               age: body.age,
               email: body.email,
-              buy_quantity: 1,
+              sex: body.sex,
               address: {
                 create: {
                   street: body.street,
@@ -114,16 +139,22 @@ const updateClient = async (req, res) => {
           lastname: body.lastname,
           age: body.age,
           email: body.email,
-          buy_quantity: 1,
-          address: {
-            update: {
-              street: body.street,
-              house_number: parseInt(body.house_number),
-              country: body.country,
-              neighborhood: body.neighbourhood,
-              postal_code: body.postal_code,
-            },
-          },
+          sex: body.sex,
+          updated_at: new Date().toISOString(),
+        },
+      })
+
+      await prisma.clientAddress.update({
+        where: {
+          client_id: clientId,
+        },
+        data: {
+          street: body.street,
+          house_number: parseInt(body.house_number),
+          country: body.country,
+          neighborhood: body.neighbourhood,
+          postal_code: body.postal_code,
+          updated_at: new Date().toISOString(),
         },
       })
 
@@ -148,6 +179,12 @@ const deleteClient = async (req, res) => {
     })
 
     if (client) {
+      await prisma.clientAddress.deleteMany({
+        where: {
+          client_id: clientId,
+        },
+      })
+      
       await prisma.client.delete({
         where: {
           id: clientId,
