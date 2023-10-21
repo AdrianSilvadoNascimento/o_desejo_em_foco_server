@@ -22,6 +22,27 @@ const getItem = async (req, res) => {
   }
 }
 
+const getItemByBarcode = async (req, res) => {
+  try {
+    const itemBarcode = req.params.barcode
+    
+    const item = await prisma.item.findUnique({
+      where: {
+        barcode: itemBarcode,
+      },
+    })
+
+    if (item) {
+      res.status(200).json(item)
+    } else {
+      res.status(404).json({ message: 'Item não encontrado' })
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    res.status(500).json({ message: utils.errorMessage })
+  }
+}
+
 const getItems = async (req, res) => {
   try {
     const userId = req.params.id
@@ -139,6 +160,7 @@ const deleteItem = async (req, res) => {
 }
 
 module.exports = {
+  getItemByBarcode,
   registerItem,
   updateItem,
   deleteItem,
