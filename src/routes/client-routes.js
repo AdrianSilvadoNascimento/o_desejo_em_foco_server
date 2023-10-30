@@ -1,13 +1,16 @@
 const express = require('express')
+const ValidateAuthToken = require('../utils/validateAuthToken.js')
+const ClientController = require('../controllers/client-controller.js')
 
-const clientController = require('../controllers/client-controller')
+const clientController = new ClientController()
+const validateAuthToken = new ValidateAuthToken()
 
 const router = express.Router()
 
-router.get('/get-client/:id', clientController.getClient)
-router.get('/get-clients/:id', clientController.getClients)
-router.put('/update-client/:id', clientController.updateClient)
-router.delete('/delete-client/:id', clientController.deleteClient)
-router.post('/register-client/:id', clientController.registerClient)
+router.get('/get-client/:id', validateAuthToken.validateToken, clientController.getClient)
+router.get('/get-clients/:id', validateAuthToken.validateToken, clientController.getClients)
+router.put('/update-client/:id', validateAuthToken.validateToken, clientController.updateClient)
+router.delete('/delete-client/:id', validateAuthToken.validateToken, clientController.deleteClient)
+router.post('/register-client/:id', validateAuthToken.validateToken, clientController.registerClient)
 
 module.exports = router
