@@ -131,6 +131,7 @@ class UserController {
             employeeId: employee ? employee.id : '',
             expiresIn: 3600,
             user: user.name,
+            type: user.type,
           })
         }
       } else {
